@@ -1,12 +1,13 @@
 import moment from "moment/moment";
-import { useState } from "react";
-import { useSelector } from "react-redux";
-
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
 export const Table = () => {
     
+    const dispatch = useDispatch();
+
     const { listaMes } = useSelector( state => state.mes );
-    
+
     const meses = [
         'Enero',   'Febrero',   'Marzo', 
         'Abril',   'Mayo',      'Junio', 
@@ -20,13 +21,13 @@ export const Table = () => {
     const [mesElegido, setMesElegido] = useState(getMoth());
     
 
-    const calcularCuota = ( { fechaMesCompra }, anio = 0, mes = 0, dia = 1) => { // mes = 0 = Enero
+    const calcularCuota = ( { DATE_MONTH_PURCHASE }, anio = 0, mes = 0, dia = 1) => { // mes = 0 = Enero
         const now = moment(new Date(anio, mes, dia));
-        const inf = moment(fechaMesCompra);
+        const inf = moment(DATE_MONTH_PURCHASE);
         return now.diff(inf,'month');
     }
 
-    const renderObject = ( evt ) => {
+    const onClickTab = ( evt ) => {
         
         const { value } = evt.target;
 
@@ -38,7 +39,7 @@ export const Table = () => {
             return
       
         const map = listaMes
-            .filter( d =>  calcularCuota(d, new Date().getFullYear(), meses.indexOf(value)) <= d.cuotas)
+            .filter( d =>  calcularCuota(d, new Date().getFullYear(), meses.indexOf(value)) <= d.FEES)
             .map( producto => {
                 return {
                     ...producto, 
@@ -50,14 +51,21 @@ export const Table = () => {
         // Calculo del subtotal;
         let subTotalTemp = 0;
         let totalTemp = 0;
-        for(let v of listaMesRender){
-            subTotalTemp += parseInt(v.pagoMes);
-            totalTemp += parseInt(v.total);             
+        for(let v of map){
+            subTotalTemp += parseInt(v.MONTH_PAY);
+            totalTemp += parseInt(v.TOTAL);             
         }
         setSubtotal(subTotalTemp);
         setTotalTarjeta(totalTemp);
     }
     
+    const format = ( PURCHASE_DATE ) => moment(PURCHASE_DATE).utcOffset(0).format('DD/MM/YYYYTHH:mm');
+
+    useEffect(() => {
+        console.warn("RENDER....");
+        onClickTab( { target:{ value:'Enero' }  } );
+    }, [listaMes] );
+
     return (
         <div className="p-5">
             
@@ -67,7 +75,7 @@ export const Table = () => {
                     {
                         meses.map( m => { 
                             return  <li key={m} className="nav-item" role="presentation">
-                                <button className="nav-link" value={m} type="button" onClick={renderObject}>{m}</button>
+                                <button className="nav-link" value={m} type="button" onClick={onClickTab}>{m}</button>
                             </li>
                         } )
                     }
@@ -91,9 +99,9 @@ export const Table = () => {
                             return (
                                 <tr className="" key={i}>
                                     <th className="col-md-1">{ i + 1} </th>
-                                    <td className="col-md-1"> {(d.cuotaNro == 0) ? `- / ${d.cuotas}` : `${d.cuotaNro} / ${d.cuotas}` }  </td>
-                                    <td className="col-md-8"> { d.producto + ' ' + d.fechaCompra.replace('T', ' ')} </td>
-                                    <td className="col-md-2">$ { d.pagoMes }  </td>
+                                    <td className="col-md-1"> {(d.cuotaNro == 0) ? `- / ${d.FEES}` : `${d.cuotaNro} / ${d.FEES}` }  </td>
+                                    <td className="col-md-8"> { d.NAME + ' -- Comprado el: ' + format(d.PURCHASE_DATE).replace('T', ' ')} </td>
+                                    <td className="col-md-2">$ { d.MONTH_PAY }  </td>
                                 </tr>
                             )
                         }) 

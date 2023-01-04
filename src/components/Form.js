@@ -3,10 +3,6 @@ import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { startAddMes, startGetMes } from "../store/action/actionMes";
 
-const styles = {
-    //width: '300px'
-}
-
 export const Form = () => {
     
     const dispatch = useDispatch();
@@ -45,15 +41,15 @@ export const Form = () => {
         const date = new Date();
         const now = new Date(date.getFullYear(), date.getMonth(), 1, 0,0);
 
-        const gasto = {
-            producto: producto,
-            total: gastoTotal,
-            cuotas: cantCuotas,
-            pagoMes: valorEnCuota,
-            fechaCompra: moment().format('YYYY-MM-DDTHH:mm'),
-            fechaMesCompra: moment(now).format('YYYY-MM-DDTHH:mm')
+        const info = {
+            NAME: producto,
+            TOTAL: gastoTotal,
+            FEES: cantCuotas,
+            MONTH_PAY: valorEnCuota,
+            PURCHASE_DATE: moment().format('YYYY-MM-DDTHH:mm'),
+            DATE_MONTH_PURCHASE: moment(now).format('YYYY-MM-DDTHH:mm')
         }
-        dispatch(startAddMes(gasto));
+        dispatch(startAddMes(info));
         dispatch(startGetMes());
     }
 
@@ -69,8 +65,9 @@ export const Form = () => {
         setProducto('');
     }
 
+    
     return (
-        <div className="container-sm col-lg-6" style={styles}>
+        <div className="container-sm col-lg-6">
             
             <h1>Carga de gastos / compras</h1>
 

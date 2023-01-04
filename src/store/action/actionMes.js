@@ -10,6 +10,12 @@ export const startGetMes = () => {
     }
 }
 
+export const startSetMes = ( data ) => {
+    return async (dispatch) => {
+        dispatch(setElementos(data));
+    }
+}
+
 const addElemento = (elemento) => ({
     type: '@mes/add',
     payload: elemento
@@ -17,4 +23,9 @@ const addElemento = (elemento) => ({
 
 const getElementos = () => ({
     type: '@mes/getall'
+})
+
+const setElementos = ( elementos ) => ({
+    type: '@mes/set',
+    payload: elementos
 })
