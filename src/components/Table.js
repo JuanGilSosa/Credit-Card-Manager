@@ -1,32 +1,27 @@
-import moment from "moment/moment";
 import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
+import { calcularCuota, format, verificarCuotaAnio } from "../helpers/funcHelper";
+
+// Global 
+const MESES = [
+    'Enero',   'Febrero',   'Marzo', 
+    'Abril',   'Mayo',      'Junio', 
+    'Julio',   'Agosto',    'Septiembre', 
+    'Octubre', 'Noviembre', 'Diciembre'
+];
 
 export const Table = () => {
     
-    const dispatch = useDispatch();
-
     const { listaMes } = useSelector( state => state.mes );
 
-    const meses = [
-        'Enero',   'Febrero',   'Marzo', 
-        'Abril',   'Mayo',      'Junio', 
-        'Julio',   'Agosto',    'Septiembre', 
-        'Octubre', 'Noviembre', 'Diciembre'
-    ]; const getMoth = () => meses.at(new Date().getMonth().valueOf());
+    // Obtengo el mes de ahora
+    const getMoth = () => MESES.at( new Date().getMonth().valueOf() );
     
-    const [subTotal, setSubtotal] = useState( 0 );
-    const [totalTarjeta, setTotalTarjeta] = useState( 0 );
-    const [listaMesRender, setListaMesRender] = useState([]);
-    const [mesElegido, setMesElegido] = useState(getMoth());
+    const [subTotal, setSubtotal]             = useState( 0 );
+    const [totalTarjeta, setTotalTarjeta]     = useState( 0 );
+    const [listaMesRender, setListaMesRender] = useState( [] );
+    const [mesElegido, setMesElegido]         = useState( getMoth() );
     
-
-    const calcularCuota = ( { DATE_MONTH_PURCHASE }, anio = 0, mes = 0, dia = 1) => { // mes = 0 = Enero
-        const now = moment(new Date(anio, mes, dia));
-        const inf = moment(DATE_MONTH_PURCHASE);
-        return now.diff(inf,'month');
-    }
-
     const onClickTab = ( evt ) => {
         
         const { value } = evt.target;
@@ -38,42 +33,65 @@ export const Table = () => {
         if(!listaMes)
             return
       
-        const map = listaMes
-            .filter( d =>  calcularCuota(d, new Date().getFullYear(), meses.indexOf(value)) <= d.FEES)
+        // Formateo lista filtrada donde la cuota calculada sea menor que la cuota del objeto
+        // Luego mapeo el objeto con la cuota nro en la que se encuentra el mes actual
+        const mapped = listaMes
+            .filter( d =>  calcularCuota(d, new Date().getFullYear(), MESES.indexOf(value)) <= d.FEES)
             .map( producto => {
                 return {
                     ...producto, 
-                    cuotaNro: calcularCuota(producto,  new Date().getFullYear(), meses.indexOf(value) )
+                    cuotaNro: calcularCuota(producto,  new Date().getFullYear(), MESES.indexOf(value) )
                 }
-            });
-        setListaMesRender(map);
+        });
         
-        // Calculo del subtotal;
+        setListaMesRender( mapped );
+        
+        // Calculo del subtotal & total;
         let subTotalTemp = 0;
         let totalTemp = 0;
-        for(let v of map){
-            subTotalTemp += parseInt(v.MONTH_PAY);
+        for(let v of mapped){
+
             totalTemp += parseInt(v.TOTAL);             
+            
+            if(v.FEES == v.cuotaNro) // Necesario para que no sume al proximo mes la cuota que cancela finalmente una compra
+                continue;
+
+            subTotalTemp += parseInt(v.MONTH_PAY);
         }
         setSubtotal(subTotalTemp);
         setTotalTarjeta(totalTemp);
     }
     
-    const format = ( PURCHASE_DATE ) => moment(PURCHASE_DATE).utcOffset(0).format('DD/MM/YYYYTHH:mm');
+    /**
+     * @NOTE Generadores de render para hacer mas legible el codigo
+     */
+    const generarNroCuota = ( cuotaNro, FEES ) => cuotaNro == 0 && FEES == 12 ? FEES : '-';
+
+    const generarColDescripcion = ( { NAME, PURCHASE_DATE, FEES  } ) => 
+        NAME + ' - ( Comprado el: ' + format(PURCHASE_DATE).replace('T', ' ') + ' )' + ` a ${FEES} cuota/s`;
+
+    const generarColCuota = ( { cuotaNro, FEES } ) => 
+        (cuotaNro == 0) ? `${ generarNroCuota( cuotaNro, FEES ) } / ${FEES}` : `${cuotaNro} / ${FEES}`;
+
+    const generarClase = ( {
+        FEES, cuotaNro,
+    } ) => (FEES == cuotaNro) ? 'my-table-success' : ( (FEES == 12 && cuotaNro == 0) ? 'my-table-year' : (cuotaNro == 0 ? 'my-table-primary' : ''))
+
+    // ./ Generadores de render
+
 
     useEffect(() => {
-        console.warn("RENDER....");
         onClickTab( { target:{ value:'Enero' }  } );
     }, [listaMes] );
 
     return (
-        <div className="p-5">
+        <div className="p-5 container">
             
             {/** TABS de nuestra tabla */}
             <div className="">
                 <ul className="nav nav-tabs" id="myTab" role="tablist">
                     {
-                        meses.map( m => { 
+                        MESES.map( m => { 
                             return  <li key={m} className="nav-item" role="presentation">
                                 <button className="nav-link" value={m} type="button" onClick={onClickTab}>{m}</button>
                             </li>
@@ -86,10 +104,10 @@ export const Table = () => {
             <table className="table table-hover p-5">
                 <thead>
                     <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">Cuota</th>
-                    <th scope="col">Producto</th>
-                    <th scope="col">Monto</th>
+                        <th scope="col">#</th>
+                        <th scope="col">Cuota</th>
+                        <th scope="col">Producto</th>
+                        <th scope="col">Monto</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -97,11 +115,13 @@ export const Table = () => {
                         listaMesRender.map( (d, i) => {
                             
                             return (
-                                <tr className="" key={i}>
-                                    <th className="col-md-1">{ i + 1} </th>
-                                    <td className="col-md-1"> {(d.cuotaNro == 0) ? `- / ${d.FEES}` : `${d.cuotaNro} / ${d.FEES}` }  </td>
-                                    <td className="col-md-8"> { d.NAME + ' -- Comprado el: ' + format(d.PURCHASE_DATE).replace('T', ' ')} </td>
-                                    <td className="col-md-2">$ { d.MONTH_PAY }  </td>
+                                <tr 
+                                    className={  generarClase(d) } 
+                                    key={i}>
+                                        <th className="col-md-1">{ i + 1} </th>
+                                        <td className="col-md-1"> { generarColCuota(d) }  </td>
+                                        <td className="col-md-8"> { generarColDescripcion(d) } </td>
+                                        <td className="col-md-2">$ { d.MONTH_PAY }  </td>
                                 </tr>
                             )
                         }) 

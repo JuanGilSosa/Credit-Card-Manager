@@ -1,6 +1,17 @@
 *{
   margin: 0;
   padding: 0;
-  background: #1e1e1e;
-  color: white;
+  /* background:rgb(44, 42, 42) ;
+  color: white; */
+}
+
+.my-table-success{
+  background: #77DD77!important;
+}
+.my-table-primary{
+  background: #84B6F4!important;
+}
+.my-table-year {
+  background: rgb(132,182,244);
+  background: linear-gradient(90deg, rgba(132,182,244,1) 0%, rgba(132,244,203,1) 50%, rgba(119,221,119,1) 100%);  
 }

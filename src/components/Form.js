@@ -43,12 +43,13 @@ export const Form = () => {
 
         const info = {
             NAME: producto,
-            TOTAL: gastoTotal,
-            FEES: cantCuotas,
-            MONTH_PAY: valorEnCuota,
-            PURCHASE_DATE: moment().format('YYYY-MM-DDTHH:mm'),
-            DATE_MONTH_PURCHASE: moment(now).format('YYYY-MM-DDTHH:mm')
+            TOTAL: parseFloat(gastoTotal.toFixed(2)),
+            FEES: parseInt(cantCuotas),
+            MONTH_PAY: parseFloat(valorEnCuota.toFixed(2)),
+            PURCHASE_DATE: moment().format('YYYY-MM-DD HH:mm'),
+            DATE_MONTH_PURCHASE: moment(now).format('YYYY-MM-DD HH:mm')
         }
+
         dispatch(startAddMes(info));
         dispatch(startGetMes());
     }
@@ -59,10 +60,7 @@ export const Form = () => {
     }
 
     const onClickLimpiar = () => {
-        setValorEnCuota(0);
-        setCantCuotas(0);
-        setGastoTotal(0);
-        setProducto('');
+ 
     }
 
     

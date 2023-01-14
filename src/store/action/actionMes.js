@@ -1,6 +1,15 @@
+import { fetchService } from "../../services/fetchService";
+
 export const startAddMes = (elemento) => {
     return async (dispatch) => {
-        dispatch(addElemento(elemento));
+        fetchService('/purchase/add', elemento, 'POST')
+            .then( res => {
+                if(!res){
+                    console.log("No pude guardarte la info :c");
+                    return;
+                }
+                dispatch(addElemento(elemento));
+            } );
     }
 }
 
