@@ -38,17 +38,14 @@ export const Form = () => {
 
     const onClickAgregar = () => {
 
-        const date = new Date();
-        const now = new Date(date.getFullYear(), date.getMonth(), 1, 0,0);
-
-        const info = {
+        let info = {
             NAME: producto,
             TOTAL: parseFloat(gastoTotal.toFixed(2)),
             FEES: parseInt(cantCuotas),
             MONTH_PAY: parseFloat(valorEnCuota.toFixed(2)),
             PURCHASE_DATE: moment().format('YYYY-MM-DD HH:mm'),
-            DATE_MONTH_PURCHASE: moment(now).format('YYYY-MM-DD HH:mm')
-        }
+            DATE_MONTH_PURCHASE: moment().format('YYYY-MM-DD 00:00')
+        };
 
         dispatch(startAddMes(info));
         dispatch(startGetMes());
