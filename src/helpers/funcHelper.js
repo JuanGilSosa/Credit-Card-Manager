@@ -32,19 +32,36 @@ export const verificarCuotaAnio = ( obj ) => {
  * @returns Retorna la cantidad de cuotas en la que se encuentra desde que hizo la compra
  * @note Esto se hizo debido a que la funcion {calcularCuota} que usa moment, no calcula bien 
  */
-export const calcularCuotaManual = ( mesCompra, mesActual ) => {
-    console.log(mesCompra, mesActual);
-    if( mesCompra < mesActual ) { // Compre en Febrero y estoy en Mayo .- Cuota Nro°3 
-      return mesActual - mesCompra;      
-    } 
+export const calcularCuotaManual = ( mesCompra, mesActual, anioCompra ) => {
+
+    let res = 2 * 10;
+    
+    const anioActual = new Date().getFullYear();
+
+    const auxDateCompra = moment(new Date(anioCompra, mesCompra, 0));
+    const auxDateActual = moment(new Date(anioActual, mesActual, 0));
+    const diff = Math.abs( auxDateCompra.diff(auxDateActual, 'month') );
+
+    if(diff == 12)
+      res = 12;
+    
+    // Simula fin compra .-
+    if ( diff >= 12 ) 
+      res = 2 * 10; // Este es un valor relativo, solo simboliza que 20 es mucho mayor que las cuotas que son 12 como maximo
+    
+    if ( mesCompra < mesActual ) // Compre en Febrero y estoy en Mayo .- Cuota Nro°3 
+      res = mesActual - mesCompra;      
+    
+
     if ( mesCompra > mesActual  ) { // Compre en Noviembre y estoy en Enero .- Cuota Nro°2
       const a = (mesCompra - mesActual);
-      return 12 - a;
+      res = 12 - a;
     } 
-    if ( mesCompra == mesActual ) { // fin compra .-
-      return 0;
-    }
+
+    if ( mesCompra == mesActual )  // también simula fin compra .-
+      res = 0;
     
-    return -1;
+    
+    return res;
   }
   

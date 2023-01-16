@@ -30,30 +30,31 @@ export const Table = () => {
         if(!listaMes)
             return
       
-        // Luego mapeo el objeto con la cuota nro en la que se encuentra el mes actual
-        console.log(new Date().getMonth())
+
+        const info = new Date().getMonth();
         const mapped = listaMes
-        .filter( p => calcularCuotaManual(new Date(p.DATE_MONTH_PURCHASE).getMonth(), 1) <= p.FEES )
-        .map( producto => {
-            return {
-                ...producto, 
-                cuotaNro: calcularCuotaManual(new Date(producto.DATE_MONTH_PURCHASE).getMonth(), new Date().getMonth() )
-            }
-        });
+            .map( producto => {
+                return {
+                    ...producto, 
+                    cuotaNro: calcularCuotaManual(new Date(producto.DATE_MONTH_PURCHASE).getMonth(), info, new Date(producto.DATE_MONTH_PURCHASE).getFullYear() )
+                }
+            })
+            .filter( p => p.cuotaNro <= p.FEES );
+        
         
         setListaMesRender( mapped );
-        
+
         // Calculo del subtotal & total;
         let subTotalTemp = 0;
         let totalTemp = 0;
         for(let v of mapped){
-            totalTemp += parseInt(v.TOTAL);             
+            totalTemp += parseFloat(v.TOTAL);             
             if(v.FEES == v.cuotaNro) { // Necesario para que no sume al proximo mes la cuota que cancela finalmente una compra
-                console.log(v);
                 continue;
             }
             subTotalTemp += parseFloat(v.MONTH_PAY);
         }
+
         setSubtotal(subTotalTemp);
         setTotalTarjeta(totalTemp);
     }
