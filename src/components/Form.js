@@ -36,8 +36,10 @@ export const Form = () => {
         setValorEnCuota(res);
     }
 
-    const onClickAgregar = () => {
-
+    const onClickAgregar = ( e ) => {
+        
+        e.preventDefault();
+        
         let info = {
             NAME: producto,
             TOTAL: parseFloat(gastoTotal.toFixed(2)),
@@ -49,6 +51,10 @@ export const Form = () => {
 
         dispatch(startAddMes(info));
         dispatch(startGetMes());
+        
+        document.getElementById('myForm').reset();
+        onClickLimpiar();
+
     }
 
     const onChangeProducto = ( { target } ) => {
@@ -57,7 +63,10 @@ export const Form = () => {
     }
 
     const onClickLimpiar = () => {
- 
+        setValorEnCuota(null);
+        setGastoTotal(null);
+        setCantCuotas(1);
+        setProducto('');
     }
 
     
@@ -65,43 +74,43 @@ export const Form = () => {
         <div className="container-sm col-lg-6">
             
             <h1>Carga de gastos / compras</h1>
+            <form id="myForm">
+                <div className="row">
+                    <div className="col-md-4">
+                        <span>Descripcion de la compra: </span>
+                        <input placeholder="Ingrese descripcion ... por ej. Olla" className="form-control" type="text" max="50" onChange={onChangeProducto}/>
+                    </div>
+                    <div className="col-md-6 mb-3">
+                        <span>Precio final: </span>
+                        <input  type="number" 
+                                className="form-control" 
+                                placeholder="Ingrese gasto . . ."
+                                onChange={onKeyDownGasto}/>
+                    </div>
 
-            <div className="row">
-                <div className="col-md-4">
-                    <span>Descripcion de la compra: </span>
-                    <input placeholder="Ingrese descripcion ... por ej. Olla" className="form-control" type="text" max="50" onChange={onChangeProducto}/>
+                    <div className="col-md-2">
+                        <span>Cuotas:</span>
+                        
+                        <select className="form-select" onChange={onChangeCuotas}>
+                        {
+                            cuotas.map( v => {
+                                return <option key={v} value={v}> {v} </option>
+                            } )
+                        }
+                        </select>
+                    </div>
+
+                    <div className="col-md-4">
+                        <label>$ Total en cuotas</label>
+                        <input className="form-control" type="text" disabled placeholder={valorEnCuota}/>
+                    </div>
                 </div>
-                <div className="col-md-6 mb-3">
-                    <span>Precio final: </span>
-                    <input  type="number" 
-                            className="form-control" 
-                            placeholder="Ingrese gasto . . ."
-                            onChange={onKeyDownGasto}/>
+
+                <div className="mt-1">
+                    <button className="btn btn-danger m-1"  type="reset"  onClick={ onClickLimpiar }>Limpiar</button>
+                    <button className="btn btn-success m-1" type="submit" onClick={ onClickAgregar }>Agregar</button>
                 </div>
-
-                <div className="col-md-2">
-                    <span>Cuotas:</span>
-                    
-                    <select className="form-select" onChange={onChangeCuotas}>
-                    {
-                        cuotas.map( v => {
-                            return <option key={v} value={v}> {v} </option>
-                        } )
-                    }
-                    </select>
-                </div>
-
-                <div className="col-md-4">
-                    <label>$ Total en cuotas</label>
-                    <input className="form-control" type="text" disabled placeholder={valorEnCuota}/>
-                </div>
-            </div>
-
-            <div className="mt-1">
-                <button className="btn btn-danger m-1" onClick={ onClickLimpiar }>Limpiar</button>
-                <button className="btn btn-success m-1" onClick={ onClickAgregar }>Agregar</button>
-            </div>
-
+            </form>
         </div>
 
     )

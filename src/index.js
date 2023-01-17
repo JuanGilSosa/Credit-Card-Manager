@@ -3,7 +3,12 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+
+// Import de bootstrap para obtener sus funcionalidades
 import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/js/bootstrap.min.js';
+// ./ bootstrap
+
 import store from './store/store';
 import { Provider } from 'react-redux';
 

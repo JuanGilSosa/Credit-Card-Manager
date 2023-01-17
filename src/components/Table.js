@@ -1,42 +1,34 @@
-import moment from "moment";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { calcularCuota, format, calcularCuotaManual } from "../helpers/funcHelper";
+import { generarColDescripcion, generarClase, generarColCuota, calcularCuota } from "../helpers/funcHelper";
 
-// Global 
 const MESES = [
-    'Enero',   'Febrero',   'Marzo', 
-    'Abril',   'Mayo',      'Junio', 
-    'Julio',   'Agosto',    'Septiembre', 
-    'Octubre', 'Noviembre', 'Diciembre'
-];
+    'ENERO', 'FEBRERO', 'MARZO',
+    'ABRIL', 'MAYO', 'JUNIO',
+    'JULIO', 'AGOSTO', 'SEPTIEMBRE',
+    'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE'
+]
 
 export const Table = () => {
     
     const { listaMes } = useSelector( state => state.mes );
-
-    // Obtengo el mes de ahora
-    const getMoth = () => MESES.at( new Date().getMonth().valueOf() );
     
     const [subTotal, setSubtotal]             = useState( 0 );
-    const [totalTarjeta, setTotalTarjeta]     = useState( 0 );
     const [listaMesRender, setListaMesRender] = useState( [] );
-    
+    const [mesFiltro, setMesFiltro]           = useState( new Date().getMonth() );
+
     const initRender = () => {
-        
         setSubtotal(0);
-        setTotalTarjeta(0);
 
         if(!listaMes)
             return
       
-
-        const info = new Date().getMonth();
         const mapped = listaMes
             .map( producto => {
                 return {
                     ...producto, 
-                    cuotaNro: calcularCuotaManual(new Date(producto.DATE_MONTH_PURCHASE).getMonth(), info, new Date(producto.DATE_MONTH_PURCHASE).getFullYear() )
+                    //cuotaNro: calcularCuotaManual(new Date(producto.DATE_MONTH_PURCHASE).getMonth(), mesFiltro, new Date(producto.DATE_MONTH_PURCHASE).getFullYear() )
+                    cuotaNro: calcularCuota(producto, mesFiltro)        
                 }
             })
             .filter( p => p.cuotaNro <= p.FEES );
@@ -56,32 +48,26 @@ export const Table = () => {
         }
 
         setSubtotal(subTotalTemp);
-        setTotalTarjeta(totalTemp);
     }
     
-    /**
-     * @NOTE Generadores de render para hacer mas legible el codigo
-     */
-    const generarNroCuota = ( cuotaNro, FEES ) => cuotaNro == 0 && FEES == 12 ? FEES : '-';
-
-    const generarColDescripcion = ( { NAME, PURCHASE_DATE, FEES  } ) => 
-        NAME + ` - ( Comprado el ${format(PURCHASE_DATE).replace('T', ' ') + ' )'} a ${FEES} cuota/s`;
-
-    const generarColCuota = ( { cuotaNro, FEES } ) => 
-        (cuotaNro == 0) ? `${ generarNroCuota( cuotaNro, FEES ) } / ${FEES}` : `${cuotaNro} / ${FEES}`;
-
-    const generarClase = ( {
-        FEES, cuotaNro,
-    } ) => (FEES == cuotaNro) ? 'my-table-success' : ( (FEES == 12 && cuotaNro == 0) ? 'my-table-year' : (cuotaNro == 0 ? 'my-table-primary' : ''))
-
-    // ./ Generadores de render
+    const onChangeMes = ( { target } ) => {
+        const { value } = target;
+        setMesFiltro(value);
+    }
 
 
-    useEffect(initRender, [listaMes] );
+    useEffect(initRender, [listaMes, mesFiltro] );
 
     return (
         <div className="p-5 container">
-
+            <div className="col-md-3 mb-4">
+                <span>Filtrar gasto por el mes de: </span>
+                <select className="form-control" onChange={ onChangeMes }>
+                    {
+                        MESES.map( (m, i)  => <option defaultChecked={ mesFiltro }  key={ i } value={ i }> { m } </option> )
+                    }
+                </select>
+            </div>
             <table className="table table-hover  p-5">
                 <thead>
                     <tr>
@@ -97,7 +83,7 @@ export const Table = () => {
                             
                             return (
                                 <tr 
-                                    className={  generarClase(d) } 
+                                    className={ generarClase(d) } 
                                     key={i}>
                                         <th className="col-md-1">{ i + 1 } </th>
                                         <td className="col-md-8"> { generarColDescripcion(d) } </td>
@@ -110,7 +96,6 @@ export const Table = () => {
                 </tbody>
                 <caption>
                     <div> Subtotal del prox. mes: <b>$ { subTotal }</b> </div>
-                    <div> <b> TOTAL TARJETA: $ { totalTarjeta } .- </b> </div>
                 </caption>
                 
             </table>

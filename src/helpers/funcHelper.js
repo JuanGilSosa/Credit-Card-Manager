@@ -1,7 +1,9 @@
 import moment from "moment/moment";
 
-export const calcularCuota = ( { DATE_MONTH_PURCHASE, FEES }, anio = 0, mes = 0, dia = 1) => { // mes = 0 = Enero
-    const now  = moment(new Date(anio, mes, dia));
+export const calcularCuota = ( { DATE_MONTH_PURCHASE }, month = 0 ) => { 
+    const fecha = new Date();  
+    fecha.setMonth(month); // Seteamos el mes, que se obtendra desde el filtro select
+    const now  = moment(fecha);
     const inf  = moment(DATE_MONTH_PURCHASE);
     const diff = now.diff(inf, 'month');
     return diff;
@@ -42,16 +44,16 @@ export const calcularCuotaManual = ( mesCompra, mesActual, anioCompra ) => {
     const auxDateActual = moment(new Date(anioActual, mesActual, 0));
     const diff = Math.abs( auxDateCompra.diff(auxDateActual, 'month') );
 
-    if(diff == 12)
-      res = 12;
-    
+ 
     // Simula fin compra .-
     if ( diff >= 12 ) 
       res = 2 * 10; // Este es un valor relativo, solo simboliza que 20 es mucho mayor que las cuotas que son 12 como maximo
     
+      if(diff == 12)
+      res = 12;
+   
     if ( mesCompra < mesActual ) // Compre en Febrero y estoy en Mayo .- Cuota Nro°3 
       res = mesActual - mesCompra;      
-    
 
     if ( mesCompra > mesActual  ) { // Compre en Noviembre y estoy en Enero .- Cuota Nro°2
       const a = (mesCompra - mesActual);
@@ -65,3 +67,18 @@ export const calcularCuotaManual = ( mesCompra, mesActual, anioCompra ) => {
     return res;
   }
   
+
+/**
+* @NOTE Generadores de render para hacer mas legible el codigo
+*/
+export const generarNroCuota = (cuotaNro, FEES) => cuotaNro == 0 && FEES == 12 ? FEES : '-';
+export const generarColDescripcion = ({ NAME, PURCHASE_DATE, FEES }) =>
+  NAME + ` - ( Comprado el ${format(PURCHASE_DATE).replace('T', ' ') + ' )'} a ${FEES} cuota/s`;
+
+export const generarColCuota = ({ cuotaNro, FEES }) =>
+  (cuotaNro == 0) ? `${generarNroCuota(cuotaNro, FEES)} / ${FEES}` : `${cuotaNro} / ${FEES}`;
+
+export const generarClase = ({
+  FEES, cuotaNro,
+}) => (FEES <= cuotaNro) ? 'my-bg-success' : ((FEES == 12 && cuotaNro == 0) ? 'my-bg-year' : (cuotaNro == 0 ? 'my-bg-primary' : ''))
+
