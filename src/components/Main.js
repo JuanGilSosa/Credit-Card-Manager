@@ -1,13 +1,17 @@
 import { useDispatch } from "react-redux";
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, Link } from "react-router-dom";
 import { fetchService } from "../services/fetchService";
 import { startGetMes, startSetMes } from "../store/action/actionMes";
-import { History } from "./History";
 import { Manager } from "./Manajer";
+import { History } from "./History";
+
+const styleLink = {
+    color: 'white',
+    textDecoration: 'none'
+  }
 
 export const Main = () => {
     const dispatch = useDispatch();
-
     fetchService('/purchase/getall')
         .then(res => {
             if (res.ok) {
@@ -17,6 +21,25 @@ export const Main = () => {
         });
 
     return (
-        <Manager />
+        <div>
+            <nav className="navbar navbar-expand-lg bg-body-tertiary bg-dark">
+                <div className="container-fluid">
+                    <Link className='navbar-brand' style={styleLink} to='/'>Menu</Link>
+                    <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+                        <span className="navbar-toggler-icon"></span>
+                    </button>
+                    <div className="collapse navbar-collapse" id="navbarNavAltMarkup">
+                        <div className="navbar-nav">
+                            <Link className="nav-link" style={styleLink} to='main/manager'>Administrador</Link>
+                            <Link className="nav-link" style={styleLink} to='main/history'>Historial</Link>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+            <Routes>
+                <Route path='main/manager' element={ <Manager /> }/>
+                <Route path='main/history' element={ <History /> }/>
+            </Routes>
+        </div>
     )
 }
