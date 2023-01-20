@@ -1,11 +1,13 @@
 import moment from "moment/moment";
 import { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { startAddMes, startGetMes } from "../store/action/actionMes";
 
 export const Form = () => {
     
     const dispatch = useDispatch();
+
+    const { userSession } = useSelector( state => state.user );
 
     const cuotas = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
     const [valorEnCuota, setValorEnCuota] = useState(0);
@@ -46,7 +48,8 @@ export const Form = () => {
             FEES: parseInt(cantCuotas),
             MONTH_PAY: parseFloat(valorEnCuota.toFixed(2)),
             PURCHASE_DATE: moment().format('YYYY-MM-DD HH:mm'),
-            DATE_MONTH_PURCHASE: moment().format('YYYY-MM-DD 00:00')
+            DATE_MONTH_PURCHASE: moment().format('YYYY-MM-DD 00:00'),
+            ID_USER: userSession.ID_USER
         };
 
         dispatch(startAddMes(info));

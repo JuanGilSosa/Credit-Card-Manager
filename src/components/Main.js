@@ -1,9 +1,11 @@
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Route, Routes, Link } from "react-router-dom";
 import { fetchService } from "../services/fetchService";
-import { startGetMes, startSetMes } from "../store/action/actionMes";
+import { startSetMes } from "../store/action/actionMes";
 import { Manager } from "./Manajer";
 import { History } from "./History";
+import { useEffect } from "react";
+import { delLogin } from "../store/action/actionUser";
 
 const styleLink = {
     color: 'white',
@@ -12,19 +14,28 @@ const styleLink = {
 
 export const Main = () => {
     const dispatch = useDispatch();
-    fetchService('/purchase/getall')
-        .then(res => {
-            if (res.ok) {
-                dispatch(startSetMes(res.data));
-                dispatch(startGetMes());
-            }
-        });
+    const { userSession } = useSelector( state => state.user );
+    
+
+    useEffect(() => {
+        fetchService(`/purchase/getbyuser?IdUser=${userSession?.ID_USER}`)
+            .then(res => {
+                if (res.ok) 
+                    dispatch(startSetMes(res.data));
+            });
+    }, [])
+
+
+    const cerrarSesion = () => {
+        dispatch(startSetMes([]));
+        dispatch(delLogin());
+    }
 
     return (
         <div>
             <nav className="navbar navbar-expand-lg bg-body-tertiary bg-dark">
                 <div className="container-fluid">
-                    <Link className='navbar-brand' style={styleLink} to='/'>Menu</Link>
+                    <Link className='navbar-brand' style={styleLink} to='/main/manager'>Menu</Link>
                     <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
                         <span className="navbar-toggler-icon"></span>
                     </button>
@@ -32,7 +43,11 @@ export const Main = () => {
                         <div className="navbar-nav">
                             <Link className="nav-link" style={styleLink} to='main/manager'>Administrador</Link>
                             <Link className="nav-link" style={styleLink} to='main/history'>Historial</Link>
+                            
                         </div>
+                    </div>
+                    <div className="d-flex">
+                        <Link className="nav-link" style={styleLink} to='/' onClick={ cerrarSesion }>Cerrar sesión</Link>
                     </div>
                 </div>
             </nav>
