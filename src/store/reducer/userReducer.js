@@ -1,5 +1,6 @@
 
 const initialState = {
+    code: '',
     userSession: {
         ID_USER: 0,
         USERNAME: '',
@@ -17,8 +18,8 @@ export const userReducer = (state = initialState, action) => {
             return { ...state, userSession: action.payload }
         case '@user/closesession': 
             return initialState;
-        case '@user/getsession':
-            return { ...state }
+        case '@user/setcode':
+            return { ...state, code: action.payload }
         default: 
             return initialState;
     }

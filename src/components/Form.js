@@ -1,19 +1,21 @@
 import moment from "moment/moment";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import Swal from "sweetalert2";
 import { startAddMes, startGetMes } from "../store/action/actionMes";
 
 export const Form = () => {
     
     const dispatch = useDispatch();
 
-    const { userSession } = useSelector( state => state.user );
+    const { userSession } = useSelector(store => store.user);
 
     const cuotas = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
     const [valorEnCuota, setValorEnCuota] = useState(0);
     const [gastoTotal, setGastoTotal]     = useState(0);
     const [cantCuotas, setCantCuotas]     = useState(1);
     const [producto, setProducto]         = useState('');
+    const [userSessionLocal, setUserSessionLocal] = useState({});
 
     const onChangeCuotas = ( { target } ) => {
 
@@ -49,12 +51,21 @@ export const Form = () => {
             MONTH_PAY: parseFloat(valorEnCuota.toFixed(2)),
             PURCHASE_DATE: moment().format('YYYY-MM-DD HH:mm'),
             DATE_MONTH_PURCHASE: moment().format('YYYY-MM-DD 00:00'),
-            ID_USER: userSession.ID_USER
+            ID_USER: userSessionLocal.ID_USER
         };
 
-        dispatch(startAddMes(info));
-        dispatch(startGetMes());
-        
+        Swal.fire({
+            title: '¿ Desea agregar a su registro ?',
+            showDenyButton: true,
+            confirmButtonText: 'Si, guadar',
+            denyButtonText: `No, mejor no`,
+          }).then( result => {
+            if (result.isConfirmed) {
+                dispatch(startAddMes(info));
+                dispatch(startGetMes());
+            }
+          })
+                
         document.getElementById('myForm').reset();
         onClickLimpiar();
 
@@ -72,7 +83,12 @@ export const Form = () => {
         setProducto('');
     }
 
-    
+    useEffect(() => { // Solución temporal, ver porqué se me pierde el estado de userSession
+        if(userSession.ID_USER != 0)
+            setUserSessionLocal(userSession);
+        
+    }, [userSession]);
+
     return (
         <div className="container-sm col-lg-6">
             
@@ -111,7 +127,7 @@ export const Form = () => {
 
                 <div className="mt-1">
                     <button className="btn btn-danger m-1"  type="reset"  onClick={ onClickLimpiar }>Limpiar</button>
-                    <button className="btn btn-success m-1" type="submit" onClick={ onClickAgregar }>Agregar</button>
+                    <button className="btn btn-success m-1" onClick={ onClickAgregar }>Agregar</button>
                 </div>
             </form>
         </div>

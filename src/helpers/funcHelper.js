@@ -82,3 +82,26 @@ export const generarClase = ({
   FEES, cuotaNro,
 }) => (FEES <= cuotaNro) ? 'my-bg-success' : ((FEES == 12 && cuotaNro == 0) ? 'my-bg-year' : (cuotaNro == 0 ? 'my-bg-primary' : ''))
 
+export const validarEmail = email => (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email))
+
+/**
+ * @description Genera un codigo de 4 digitos para enviar por email y luego validar el registro del usuario
+ * @returns Un codigo en formato string
+ */
+export const generarCodigo = () => {
+  const n1 = Math.floor(Math.random() * 99);
+  const n2 = Math.floor(Math.random() * 99);
+
+  if( n1.toString().length == 1 ) n2+='1';
+  if( n2.toString().length == 1 ) n2+='1';
+
+  return n2.toString() + n1;
+}
+
+export const enviarEmail = ( code, email ) => {
+  var sLink = "mailto:" + email
+			 + "?subject=" + "Código de verificación ! "
+			 + "&body=" + 'Tu código de verificación es: ' + code;
+             
+  window.location.href = sLink;
+}

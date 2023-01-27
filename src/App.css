@@ -16,10 +16,27 @@
   background: linear-gradient(90deg, rgba(132,182,244,1) 0%, rgba(132,244,203,1) 50%, rgba(119,221,119,1) 100%);  
 }
 
-
-
 .wrap{
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.btn{
+  border-radius: 0%!important;
+}
+
+.base-form{
+  border: 1px solid black;
+}
+
+.btn-times{ 
+  width: 30px;
+  height: 30px;
+  border-radius: 100px!important;
+}
+
+.btn-non-style{
+  border:none;
+  background:none;
 }

@@ -1,6 +1,10 @@
+import {  faCircleXmark, faEye } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-import { generarColDescripcion, generarClase, generarColCuota, calcularCuota } from "../helpers/funcHelper";
+import { useDispatch, useSelector } from "react-redux";
+import Swal from "sweetalert2";
+import { generarClase, generarColCuota, calcularCuota, format } from "../helpers/funcHelper";
+import { startDeleteProduct } from "../store/action/actionMes";
 
 const MESES = [
     'ENERO', 'FEBRERO', 'MARZO',
@@ -11,12 +15,14 @@ const MESES = [
 
 export const Table = () => {
     
+    const dispatch = useDispatch();
+
     const { listaMes } = useSelector( state => state.mes );
     
     const [subTotal, setSubtotal]             = useState( 0 );
     const [listaMesRender, setListaMesRender] = useState( [] );
     const [mesFiltro, setMesFiltro]           = useState( new Date().getMonth() );
-
+    
     const initRender = () => {
         setSubtotal(0);
 
@@ -54,7 +60,60 @@ export const Table = () => {
         const { value } = target;
         setMesFiltro(value);
     }
+    
+    const renderTable = ( d ) => (`
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col"></th>
+                    <th scope="col"></th>
+                </tr>
+            </thead>
+            <tbody class='text-start'>
+                <tr>
+                    <td class=''>Fecha compra</td>
+                    <td>${ format(d.PURCHASE_DATE).replace('T', ' ') }</td>
+                </tr>
+                <tr>
+                    <td class=''>Cantidad Cuotas</td>
+                    <td> ${ d.FEES } </td>
+                </tr>
+                <tr>
+                    <td class=''>Total </td>
+                    <td> $ ${ d.TOTAL} </td>
+                </tr>
+                <tr>
+                    <td class=''>Total por cuota</td>
+                    <td> $ ${ d.MONTH_PAY } </td>
+                </tr>
+            </tbody>
+        </table>
+    `);
 
+    const callSwal = ( d ) => {
+        Swal.fire({
+            title: `<strong>${d.NAME}</strong>`,
+            html: renderTable(d) ,
+            showCloseButton: true,
+            confirmButtonText: 'Aceptar'
+          })
+    }
+
+    const onClickDelete = ( { ID_PRODUCT } ) => {
+        Swal.fire({
+            title: '¿ Estás de acuerdo ?',
+            text: "Tu gasto se eliminará permanentemente",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Si, borralo!',
+            cancelButtonText: 'Cancelar',
+          }).then((result) => {
+            if (result.isConfirmed) 
+                dispatch( startDeleteProduct( ID_PRODUCT ) );
+          })
+    }
 
     useEffect(initRender, [listaMes, mesFiltro] );
 
@@ -68,13 +127,14 @@ export const Table = () => {
                     }
                 </select>
             </div>
-            <table className="table table-hover  p-5">
+            <table className="table p-5">
                 <thead>
                     <tr>
-                        <th scope="col">#</th>
+                        <th scope="col"></th>
                         <th scope="col">Producto y descripción</th>
                         <th scope="col">Cuota</th>
                         <th scope="col">Monto</th>
+                        <th scope="col">Ver</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -82,13 +142,26 @@ export const Table = () => {
                         listaMesRender.map( (d, i) => {
                             
                             return (
-                                <tr 
-                                    className={ generarClase(d) } 
-                                    key={i}>
-                                        <th className="col-md-1">{ i + 1 } </th>
-                                        <td className="col-md-8"> { generarColDescripcion(d) } </td>
+                                <tr className={ generarClase(d) } key={i}>
+
+                                        <td className=""> 
+                                            <button className="btn-non-style" 
+                                                    onClick={ () => { onClickDelete(d) }} >
+                                            <FontAwesomeIcon
+                                                icon={ faCircleXmark } 
+                                                style={{marginRight: '15px' ,color:'#dc3545', fontSize: '23px', background:'white', borderRadius: '100px', borderColor:'#dc3545'}}/>
+                                                </button>
+                                        </td>
+                                        <td className="col-md-8"> { d.NAME } </td>
                                         <td className="col-md-1"> { generarColCuota(d) } </td>
                                         <td className="col-md-2">$ { d.MONTH_PAY }  </td>
+                                        <th className="col-md-1">
+                                            <button className="btn-non-style" onClick={ () => { callSwal(d) } }>
+                                                <FontAwesomeIcon 
+                                                    style={{marginRight: '15px', fontSize: '23px'}}
+                                                    icon={faEye}/>
+                                            </button>
+                                        </th>
                                 </tr>
                             )
                         }) 

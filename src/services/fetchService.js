@@ -6,9 +6,9 @@ const handleError = ( msg ) => {
 export const fetchService = (endpoint, data,  method='GET') => {
     const URL = 'http://juanidev.sytes.net:3000/api' + endpoint;
     var res; 
-    if(method === 'POST'){
+    if(['POST','DELETE', 'PUT'].some(x => x === method)){
         res = fetch(URL, {
-            method: 'POST', 
+            method: method, 
             mode: 'cors', 
             headers: {
                 'Content-Type': 'application/json'
@@ -19,5 +19,5 @@ export const fetchService = (endpoint, data,  method='GET') => {
         res = fetch(URL);
     }
 
-    return res.then(handleSuccess, handleError('Error al obtener informacion'));
+    return res.then(handleSuccess, handleError('Error en la petición'));
 }

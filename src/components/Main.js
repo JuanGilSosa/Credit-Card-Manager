@@ -18,12 +18,12 @@ export const Main = () => {
     
 
     useEffect(() => {
-        fetchService(`/purchase/getbyuser?IdUser=${userSession?.ID_USER}`)
+        fetchService(`/purchase/getbyuser?IdUser=${userSession.ID_USER}`)
             .then(res => {
                 if (res.ok) 
                     dispatch(startSetMes(res.data));
             });
-    }, [])
+    }, []);
 
 
     const cerrarSesion = () => {
