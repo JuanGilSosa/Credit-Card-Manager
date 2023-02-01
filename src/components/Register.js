@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom"
-import { validarEmail } from "../helpers/funcHelper";
+import { validateEmail } from "../helpers/funcHelper";
 import { startRegister } from "../store/action/actionUser";
 import { ValidateRegisterModal } from "./modal/ValidateRegister";
 
@@ -53,7 +53,7 @@ export const Register = () => {
             name: name
         }
 
-        if( !validarEmail(email) ){
+        if( !validateEmail(email) ){
             console.log("El email es incorrecto");
             return;
         }

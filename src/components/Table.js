@@ -1,17 +1,36 @@
-import {  faCircleXmark, faEye } from "@fortawesome/free-solid-svg-icons";
+import { faCircleXmark, faEye } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import Select from "react-select";
 import Swal from "sweetalert2";
-import { generarClase, generarColCuota, calcularCuota, format } from "../helpers/funcHelper";
-import { startDeleteProduct } from "../store/action/actionMes";
+import { generateClass, generateColFees, format, generateColDescrptionLastYear, calculateFee } from "../helpers/funcHelper";
+import { startDeleteProduct } from "../store/action/actionMonth";
+
+const DATE = new Date();
 
 const MESES = [
-    'ENERO', 'FEBRERO', 'MARZO',
-    'ABRIL', 'MAYO', 'JUNIO',
-    'JULIO', 'AGOSTO', 'SEPTIEMBRE',
-    'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE'
-]
+    { value: 0, label: 'ENERO'      },
+    { value: 1, label: 'FEBRERO'    },
+    { value: 2, label: 'MARZO'      },
+    { value: 3, label: 'ABRIL'      },
+    { value: 4, label: 'MAYO'       },
+    { value: 5, label: 'JUNIO'      },
+    { value: 6, label: 'JULIO'      },
+    { value: 7, label: 'AGOSTO'     },
+    { value: 8, label: 'SEPTIEMBRE' },
+    { value: 9, label: 'OCTUBRE'    },
+    { value: 10, label: 'NOVIEMBRE'  },
+    { value: 11, label: 'DICIEMBRE' }
+];
+
+const ANIO = [ 
+    { value: DATE.getFullYear()-1, label: (DATE.getFullYear()-1).toString() },
+    { value: DATE.getFullYear(),   label: DATE.getFullYear().toString()     },
+    { value: DATE.getFullYear()+1, label: (DATE.getFullYear()+1).toString() },
+];
+
+
 
 export const Table = () => {
     
@@ -21,11 +40,12 @@ export const Table = () => {
     
     const [subTotal, setSubtotal]             = useState( 0 );
     const [listaMesRender, setListaMesRender] = useState( [] );
-    const [mesFiltro, setMesFiltro]           = useState( new Date().getMonth() );
-    
+    const [mesFiltro, setMesFiltro]           = useState( MESES.find( m => m.value == DATE.getMonth() ) );
+    const [anioFiltro, setAnioFiltro]         = useState( ANIO.find( a => a.value ==  DATE.getFullYear() ) );
+
     const initRender = () => {
         setSubtotal(0);
-
+        
         if(!listaMes)
             return
       
@@ -33,8 +53,7 @@ export const Table = () => {
             .map( producto => {
                 return {
                     ...producto, 
-                    //cuotaNro: calcularCuotaManual(new Date(producto.DATE_MONTH_PURCHASE).getMonth(), mesFiltro, new Date(producto.DATE_MONTH_PURCHASE).getFullYear() )
-                    cuotaNro: calcularCuota(producto, mesFiltro)        
+                    cuotaNro: calculateFee(producto, mesFiltro.value, anioFiltro.value)        
                 }
             })
             .filter( p => p.cuotaNro <= p.FEES );
@@ -46,8 +65,9 @@ export const Table = () => {
         let subTotalTemp = 0;
         let totalTemp = 0;
         for(let v of mapped){
+
             totalTemp += parseFloat(v.TOTAL);             
-            if(v.FEES == v.cuotaNro) { // Necesario para que no sume al proximo mes la cuota que cancela finalmente una compra
+            if(v.FEES == v.cuotaNro || v.cuotaNro < 0) { // Necesario para que no sume al proximo mes la cuota que cancela finalmente una compra
                 continue;
             }
             subTotalTemp += parseFloat(v.MONTH_PAY);
@@ -56,11 +76,9 @@ export const Table = () => {
         setSubtotal(subTotalTemp);
     }
     
-    const onChangeMes = ( { target } ) => {
-        const { value } = target;
-        setMesFiltro(value);
-    }
-    
+    const onChangeMes  = data => { setMesFiltro(data); }
+    const onChangeAnio = data => { setAnioFiltro(data); }
+
     const renderTable = ( d ) => (`
         <table class="table">
             <thead>
@@ -115,23 +133,30 @@ export const Table = () => {
           })
     }
 
-    useEffect(initRender, [listaMes, mesFiltro] );
+    useEffect(initRender, [listaMes, mesFiltro, anioFiltro] );
 
     return (
         <div className="p-5 container">
-            <div className="col-md-3 mb-4">
-                <span>Filtrar gasto por el mes de: </span>
-                <select className="form-control" onChange={ onChangeMes }>
-                    {
-                        MESES.map( (m, i)  => <option defaultChecked={ mesFiltro }  key={ i } value={ i }> { m } </option> )
-                    }
-                </select>
+            <div className="row">
+                <h5>Ver registros por</h5>
+                <div className="col-md-3 mb-4">
+                    <span>Mes de: </span>
+                    <Select options={MESES}
+                            value={mesFiltro}
+                            onChange={ onChangeMes }/>
+                </div>
+                <div className="col-md-3 mb-4">
+                    <span>El Año: </span>
+                    <Select options={ANIO}
+                            value={anioFiltro}
+                            onChange={ onChangeAnio }/>
+                </div>
             </div>
             <table className="table p-5">
                 <thead>
                     <tr>
                         <th scope="col"></th>
-                        <th scope="col">Producto y descripción</th>
+                        <th scope="col">Producto</th>
                         <th scope="col">Cuota</th>
                         <th scope="col">Monto</th>
                         <th scope="col">Ver</th>
@@ -142,7 +167,7 @@ export const Table = () => {
                         listaMesRender.map( (d, i) => {
                             
                             return (
-                                <tr className={ generarClase(d) } key={i}>
+                                <tr className={ generateClass(d) } key={i}>
 
                                         <td className=""> 
                                             <button className="btn-non-style" 
@@ -152,8 +177,8 @@ export const Table = () => {
                                                 style={{marginRight: '15px' ,color:'#dc3545', fontSize: '23px', background:'white', borderRadius: '100px', borderColor:'#dc3545'}}/>
                                                 </button>
                                         </td>
-                                        <td className="col-md-8"> { d.NAME } </td>
-                                        <td className="col-md-1"> { generarColCuota(d) } </td>
+                                        <td className="col-md-8"> { generateColDescrptionLastYear(d) } </td>
+                                        <td className="col-md-1"> { generateColFees(d) } </td>
                                         <td className="col-md-2">$ { d.MONTH_PAY }  </td>
                                         <th className="col-md-1">
                                             <button className="btn-non-style" onClick={ () => { callSwal(d) } }>
@@ -168,7 +193,7 @@ export const Table = () => {
                     }
                 </tbody>
                 <caption>
-                    <div> Subtotal del prox. mes: <b>$ { subTotal }</b> </div>
+                    <div> Subtotal del prox. mes: <b>$ { subTotal.toFixed(2) }</b> </div>
                 </caption>
                 
             </table>

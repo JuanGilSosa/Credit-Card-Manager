@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { generarColDescripcion, generarClase, calcularCuota } from "../helpers/funcHelper";
+import { generateColDescription, generateClass, calculateFee } from "../helpers/funcHelper";
 
 export const History = () => {
 
@@ -14,8 +14,7 @@ export const History = () => {
             listaMes.map( p => {
                 return {
                     ...p,
-                    //cuotaNro: calcularCuotaManual( new Date(p.DATE_MONTH_PURCHASE).getMonth(), new Date().getMonth(), new Date(p.DATE_MONTH_PURCHASE).getFullYear() ) 
-                    cuotaNro: calcularCuota(p, new Date().getMonth())
+                    cuotaNro: calculateFee(p, new Date().getMonth(), null)
                 }
             } )
         );
@@ -43,10 +42,10 @@ export const History = () => {
                         listaToRender.map( (d, i) => {
                             
                             return (
-                                <tr className={ generarClase(d) } 
+                                <tr className={ generateClass(d) } 
                                     key={i}>
                                         <th className="col-md-1">{ i + 1 } </th>
-                                        <th className="col-md-10">{ generarColDescripcion(d) } </th>
+                                        <th className="col-md-10">{ generateColDescription(d) } </th>
                                         <td className="col-md-2">$ { d.TOTAL }  </td>
                                 </tr>
                             )

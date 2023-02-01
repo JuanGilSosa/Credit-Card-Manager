@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useSelector } from "react-redux"
-import { generarCodigo } from "../../helpers/funcHelper";
+import { generateCode } from "../../helpers/funcHelper";
 
 export const ValidateRegisterModal = () => {
 
@@ -9,8 +9,8 @@ export const ValidateRegisterModal = () => {
     const [codigo, setCodigo] = useState('');
     
     const onClickReenviar = () => {
-        const code = generarCodigo();
-        
+        const newCode = generateCode();
+        console.log(newCode);
     }
     
     const onChangeCodigo = ( { target } ) => {
@@ -22,7 +22,7 @@ export const ValidateRegisterModal = () => {
 
     const onClickValidando = () => {
         if( codigo == '1234' ){
-
+            console.log(code);
         }
     }
 

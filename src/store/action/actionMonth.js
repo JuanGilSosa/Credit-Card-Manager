@@ -1,12 +1,18 @@
+import moment from "moment";
 import Swal from "sweetalert2";
 import { fetchService } from "../../services/fetchService";
 
-export const startAddMes = (elemento) => {
+export const startAddMonth = (product) => {
     return dispatch => {
-        fetchService('/purchase/add', elemento, 'POST')
+        fetchService('/purchase/add', product, 'POST')
             .then( res => {
+
                 if(!res){
-                    console.log("No pude guardarte la info :c");
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Algo salió mal en el servidor!',
+                    });
                     return;
                 }
 
@@ -17,9 +23,10 @@ export const startAddMes = (elemento) => {
                     showConfirmButton: false,
                     timer: 1500
                 });
-                
-                elemento.ID_PRODUCT = res.data.at(0).ID_PRODUCT;
-                dispatch(addElemento(elemento));
+
+                product.DATE_MONTH_PURCHASE = moment(product.DATE_MONTH_PURCHASE).format('YYYY-MM-DDTHH:mm:00.000[Z]'); // Refactorizo, porque sino no guarda en BD
+                product.ID_PRODUCT = res.data.at(0).ID_PRODUCT;
+                dispatch(addProduct(product));
             } );
     }
 }
@@ -33,7 +40,7 @@ export const startDeleteProduct = ( ID_PRODUCT ) => {
                 if (!res.ok)
                     return 
                 
-                dispatch( deleteElemento(ID_PRODUCT) );
+                dispatch( deleteProduct(ID_PRODUCT) );
                 Swal.fire({
                     position: 'top-end',
                     icon: 'success',
@@ -45,33 +52,33 @@ export const startDeleteProduct = ( ID_PRODUCT ) => {
     }
 }
 
-export const startGetMes = () => {
+export const startGetMonth = () => {
     return async (dispatch) => {
-        dispatch(getElementos());
+        dispatch(getProduct());
     }
 }
 
-export const startSetMes = ( data ) => {
+export const startSetMonth = ( data ) => {
     return async (dispatch) => {
-        dispatch(setElementos(data));
+        dispatch(setProducts(data));
     }
 }
 
-const addElemento = (elemento) => ({
+const addProduct = (product) => ({
     type: '@mes/add',
-    payload: elemento
+    payload: product
 })
 
-const getElementos = () => ({
+const getProduct = () => ({
     type: '@mes/getall'
 })
 
-const setElementos = ( elementos ) => ({
+const setProducts = ( products ) => ({
     type: '@mes/set',
-    payload: elementos
+    payload: products
 })
 
-const deleteElemento = ( idElemento ) => ({
+const deleteProduct = ( idProduct ) => ({
     type: '@mes/delete',
-    payload: idElemento
+    payload: idProduct
 })

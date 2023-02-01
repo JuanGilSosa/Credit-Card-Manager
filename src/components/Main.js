@@ -1,7 +1,7 @@
 import { useDispatch, useSelector } from "react-redux";
 import { Route, Routes, Link } from "react-router-dom";
 import { fetchService } from "../services/fetchService";
-import { startSetMes } from "../store/action/actionMes";
+import { startSetMonth } from "../store/action/actionMonth";
 import { Manager } from "./Manajer";
 import { History } from "./History";
 import { useEffect } from "react";
@@ -21,13 +21,12 @@ export const Main = () => {
         fetchService(`/purchase/getbyuser?IdUser=${userSession.ID_USER}`)
             .then(res => {
                 if (res.ok) 
-                    dispatch(startSetMes(res.data));
+                    dispatch(startSetMonth(res.data));
             });
     }, []);
 
-
     const cerrarSesion = () => {
-        dispatch(startSetMes([]));
+        dispatch(startSetMonth([]));
         dispatch(delLogin());
     }
 
@@ -35,7 +34,7 @@ export const Main = () => {
         <div>
             <nav className="navbar navbar-expand-lg bg-body-tertiary bg-dark">
                 <div className="container-fluid">
-                    <Link className='navbar-brand' style={styleLink} to='/main/manager'>Menu</Link>
+                    <Link className='navbar-brand' style={styleLink} to='/main/manager'> {' C C M '}   </Link>
                     <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
                         <span className="navbar-toggler-icon"></span>
                     </button>
