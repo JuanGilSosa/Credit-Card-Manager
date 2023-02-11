@@ -1,0 +1,15 @@
+.btn-card {
+    width: 100%;
+    border: 3px dashed #00b3ff;
+}
+
+.btn-card:hover{
+    background-color: #00b3ff;
+    color: white;
+    transition: background-color ease .3s;
+}
+
+.border-card{
+    border: 1px solid black;
+    border-radius: 1px;
+}

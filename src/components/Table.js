@@ -6,6 +6,16 @@ import Select from "react-select";
 import Swal from "sweetalert2";
 import { generateClass, generateColFees, format, generateColDescrptionLastYear, calculateFee } from "../helpers/funcHelper";
 import { startDeleteProduct } from "../store/action/actionMonth";
+import { setSessionUser } from "../store/action/actionUser";
+
+const styleFontAwesome = {
+    marginRight: '15px',
+    color:'#dc3545', 
+    fontSize: '23px', 
+    background:'white', 
+    borderRadius: '100px', 
+    borderColor:'#dc3545'
+};
 
 const DATE = new Date();
 
@@ -31,19 +41,24 @@ const ANIO = [
 ];
 
 
-
 export const Table = () => {
     
     const dispatch = useDispatch();
 
     const { listaMes } = useSelector( state => state.mes );
-    
+    const { userSession: u } = useSelector( state => state.user );
+
     const [subTotal, setSubtotal]             = useState( 0 );
     const [listaMesRender, setListaMesRender] = useState( [] );
     const [mesFiltro, setMesFiltro]           = useState( MESES.find( m => m.value == DATE.getMonth() ) );
     const [anioFiltro, setAnioFiltro]         = useState( ANIO.find( a => a.value ==  DATE.getFullYear() ) );
+    const [saldo, setSaldo]                   = useState( 0 ); // Verifica si tiene saldo deudor, o saldo acreedor
+    const [limite, setLimite]                 = useState( u.CREDIT_LIMIT );
+    
+    const textStyle = (saldo <= (limite*0.25) && saldo > 0) ? 'text-warning' : (saldo > 0 && saldo > (limite*0.25)) ? 'text-success' : 'text-danger';
 
     const initRender = () => {
+
         setSubtotal(0);
         
         if(!listaMes)
@@ -73,6 +88,8 @@ export const Table = () => {
             subTotalTemp += parseFloat(v.MONTH_PAY);
         }
 
+        setSaldo( limite - subTotalTemp );
+
         setSubtotal(subTotalTemp);
     }
     
@@ -89,7 +106,7 @@ export const Table = () => {
             </thead>
             <tbody class='text-start'>
                 <tr>
-                    <td class=''>Fecha compra</td>
+                    <td class=ame=''>Fecha compra</td>
                     <td>${ format(d.PURCHASE_DATE).replace('T', ' ') }</td>
                 </tr>
                 <tr>
@@ -128,8 +145,9 @@ export const Table = () => {
             confirmButtonText: 'Si, borralo!',
             cancelButtonText: 'Cancelar',
           }).then((result) => {
-            if (result.isConfirmed) 
+            if (result.isConfirmed) {
                 dispatch( startDeleteProduct( ID_PRODUCT ) );
+            }
           })
     }
 
@@ -141,17 +159,18 @@ export const Table = () => {
                 <h5>Ver registros por</h5>
                 <div className="col-md-3 mb-4">
                     <span>Mes de: </span>
-                    <Select options={MESES}
-                            value={mesFiltro}
+                    <Select options={ MESES }
+                            value={ mesFiltro }
                             onChange={ onChangeMes }/>
                 </div>
                 <div className="col-md-3 mb-4">
                     <span>El Año: </span>
-                    <Select options={ANIO}
-                            value={anioFiltro}
+                    <Select options={ ANIO }
+                            value={ anioFiltro }
                             onChange={ onChangeAnio }/>
                 </div>
             </div>
+            <div className="row fs-7">
             <table className="table p-5">
                 <thead>
                     <tr>
@@ -174,7 +193,7 @@ export const Table = () => {
                                                     onClick={ () => { onClickDelete(d) }} >
                                             <FontAwesomeIcon
                                                 icon={ faCircleXmark } 
-                                                style={{marginRight: '15px' ,color:'#dc3545', fontSize: '23px', background:'white', borderRadius: '100px', borderColor:'#dc3545'}}/>
+                                                style={ styleFontAwesome }/>
                                                 </button>
                                         </td>
                                         <td className="col-md-8"> { generateColDescrptionLastYear(d) } </td>
@@ -193,10 +212,15 @@ export const Table = () => {
                     }
                 </tbody>
                 <caption>
-                    <div> Subtotal del prox. mes: <b>$ { subTotal.toFixed(2) }</b> </div>
+                    <div> Subtotal del prox. mes: <b>$ { subTotal.toFixed(2) } &nbsp;</b> <br />
+                        { ( limite > 0 && 
+                            ( <span>( Tu saldo: <b className={textStyle}> { saldo.toFixed(2) } </b> )</span> ) 
+                        ) }
+                    </div>
                 </caption>
                 
             </table>
+            </div>
         </div>
     );
 }

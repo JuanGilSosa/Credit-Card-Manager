@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom"
+import Swal from "sweetalert2";
 import { validateEmail } from "../helpers/funcHelper";
 import { startRegister } from "../store/action/actionUser";
 import { ValidateRegisterModal } from "./modal/ValidateRegister";
@@ -54,7 +55,11 @@ export const Register = () => {
         }
 
         if( !validateEmail(email) ){
-            console.log("El email es incorrecto");
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Verifique que el email ingresado sea correcto!',
+            });
             return;
         }
 

@@ -16,6 +16,11 @@ export const setCode = ( code ) => ({
     payload: code
 });
 
+export const setLimit = ( creditLimit ) => ({
+    type: '@user/setlimit',
+    payload: creditLimit
+})
+
 export const startLogin = ( { username, pw } ) => {
     return (dispatch) => {
         const url = `/user/canlogin?username=${username}&password=${pw}`;
@@ -54,5 +59,28 @@ export const startRegister = ( newUser ) => {
                 );
                 
              } );
+    }
+}
+
+export const startSetlimit = ( { IdUser, Limite } ) => {
+    return dispatch  => {
+        const url = `/user/setlimit?IdUser=${IdUser}&Limite=${Limite}`;
+        fetchService(url, {}, 'PUT')
+            .then( res => {
+                if(!res){
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Algo salió mal!',
+                      })
+                    return;
+                }
+                dispatch(setLimit(Limite));
+                Swal.fire(
+                    'Perfecto!',
+                    'Ya tenes tu limite guardado, verifica tu saldo!!!',
+                    'success'
+                );     
+            });
     }
 }

@@ -4,8 +4,10 @@ import { fetchService } from "../services/fetchService";
 import { startSetMonth } from "../store/action/actionMonth";
 import { Manager } from "./Manajer";
 import { History } from "./History";
-import { useEffect } from "react";
-import { delLogin } from "../store/action/actionUser";
+import { useEffect, useState } from "react";
+import { delLogin, setSessionUser } from "../store/action/actionUser";
+import { Card } from "./CardComponent/Card";
+import { CreditLimit } from "./CreditLimit";
 
 const styleLink = {
     color: 'white',
@@ -14,14 +16,18 @@ const styleLink = {
 
 export const Main = () => {
     const dispatch = useDispatch();
+
+    const [user, setUser] = useState({});
     const { userSession } = useSelector( state => state.user );
     
-
     useEffect(() => {
+        setUser(userSession);
         fetchService(`/purchase/getbyuser?IdUser=${userSession.ID_USER}`)
             .then(res => {
-                if (res.ok) 
+                if (res.ok) {
                     dispatch(startSetMonth(res.data));
+                    dispatch(setSessionUser(userSession));
+                }
             });
     }, []);
 
@@ -42,7 +48,8 @@ export const Main = () => {
                         <div className="navbar-nav">
                             <Link className="nav-link" style={styleLink} to='main/manager'>Administrador</Link>
                             <Link className="nav-link" style={styleLink} to='main/history'>Historial</Link>
-                            
+                            {/* <Link className="nav-link" style={styleLink} to='main/cards'>Mis tarjetas</Link> */}
+                            <Link className="nav-link" style={styleLink} to='main/limite'>Limite</Link>
                         </div>
                     </div>
                     <div className="d-flex">
@@ -53,6 +60,8 @@ export const Main = () => {
             <Routes>
                 <Route path='main/manager' element={ <Manager /> }/>
                 <Route path='main/history' element={ <History /> }/>
+                {/* <Route path='main/cards' element={ <Card /> } /> */}
+                <Route path='main/limite' element={ <CreditLimit user={user} /> } />
             </Routes>
         </div>
     )

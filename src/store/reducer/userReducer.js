@@ -7,9 +7,9 @@ const initialState = {
         PW: '',
         EMAIL: '',
         NAME: '',
-        SURNAME: ''
+        SURNAME: '',
+        CREDIT_LIMIT: 0,
     }
-    
 }
 
 export const userReducer = (state = initialState, action) => {
@@ -20,6 +20,14 @@ export const userReducer = (state = initialState, action) => {
             return initialState;
         case '@user/setcode':
             return { ...state, code: action.payload }
+        case '@user/setlimit':
+            return { 
+                ...state, 
+                userSession: { 
+                    ...state.userSession, 
+                    CREDIT_LIMIT: parseInt(action.payload) 
+                }
+            }
         default: 
             return initialState;
     }
