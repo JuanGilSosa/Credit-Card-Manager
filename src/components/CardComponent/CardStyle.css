@@ -1,5 +1,4 @@
 .btn-card {
-    width: 100%;
     border: 3px dashed #00b3ff;
 }
 
@@ -12,4 +11,30 @@
 .border-card{
     border: 1px solid black;
     border-radius: 1px;
+}
+
+.the-card{
+    border-radius:10px;
+    width: 330px;
+    height: 200px;
+    margin-top: 20px;
+    background: rgb(255,209,229);
+background: radial-gradient(circle, rgba(255,209,229,1) 0%, rgba(97,74,228,1) 100%);
+/* background: rgb(255,209,229);
+background: radial-gradient(circle, rgba(255,209,229,1) 0%, rgba(97,74,228,1) 100%); */
+}
+
+.font-halter{
+    font-family: 'HALTER';
+}
+
+.title-card{
+    font-size: x-large;
+    font-family: 'Segoe UI';
+    font-weight: 600;
+}
+
+@font-face {
+    font-family: 'HALTER';
+    src: url('../../../assets/fonts/halter/HALTER__.ttf');
 }

@@ -161,13 +161,15 @@ export const Table = () => {
                     <span>Mes de: </span>
                     <Select options={ MESES }
                             value={ mesFiltro }
-                            onChange={ onChangeMes }/>
+                            onChange={ onChangeMes }
+                            isSearchable={ false }/>
                 </div>
                 <div className="col-md-3 mb-4">
                     <span>El Año: </span>
                     <Select options={ ANIO }
                             value={ anioFiltro }
-                            onChange={ onChangeAnio }/>
+                            onChange={ onChangeAnio }
+                            isSearchable={ false }/>
                 </div>
             </div>
             <div className="row fs-7">

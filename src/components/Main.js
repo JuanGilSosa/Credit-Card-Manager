@@ -48,7 +48,7 @@ export const Main = () => {
                         <div className="navbar-nav">
                             <Link className="nav-link" style={styleLink} to='main/manager'>Administrador</Link>
                             <Link className="nav-link" style={styleLink} to='main/history'>Historial</Link>
-                            {/* <Link className="nav-link" style={styleLink} to='main/cards'>Mis tarjetas</Link> */}
+                            <Link className="nav-link" style={styleLink} to='main/cards'>Mis tarjetas</Link>
                             <Link className="nav-link" style={styleLink} to='main/limite'>Limite</Link>
                         </div>
                     </div>
@@ -60,7 +60,7 @@ export const Main = () => {
             <Routes>
                 <Route path='main/manager' element={ <Manager /> }/>
                 <Route path='main/history' element={ <History /> }/>
-                {/* <Route path='main/cards' element={ <Card /> } /> */}
+                <Route path='main/cards' element={ <Card /> } />
                 <Route path='main/limite' element={ <CreditLimit user={user} /> } />
             </Routes>
         </div>
