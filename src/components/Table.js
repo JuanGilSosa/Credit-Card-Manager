@@ -107,7 +107,7 @@ export const Table = () => {
             <tbody class='text-start'>
                 <tr>
                     <td class=ame=''>Fecha compra</td>
-                    <td>${ format(d.PURCHASE_DATE).replace('T', ' ') }</td>
+                    <td>${ format(d.PURCHASE_DATE) }</td>
                 </tr>
                 <tr>
                     <td class=''>Cantidad Cuotas</td>

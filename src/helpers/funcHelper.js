@@ -29,7 +29,7 @@ export const calculateFee = ( { DATE_MONTH_PURCHASE }, month = 0, year = new Dat
   return diffInMonths;
 }
 
-export const format = ( PURCHASE_DATE ) => moment(PURCHASE_DATE).utcOffset(0).format('DD/MM/YYYYTHH:mm');
+export const format = ( PURCHASE_DATE ) => moment(PURCHASE_DATE).utc().format('DD/MM/YYYY HH:mm');
 
 /**
   * @NOTE Esta función se encarga de verificar si las cuotas son 12, en ese caso, retornar un arreglo con un objeto {push} repetido que tenga cuota 12/12 asi se ve en el mes de compra

@@ -14,7 +14,6 @@ export const Form = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-
     const { userSession } = useSelector(store => store.user);
 
     const cuotas = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
@@ -22,7 +21,7 @@ export const Form = () => {
     const [gastoTotal, setGastoTotal]     = useState(0);
     const [cantCuotas, setCantCuotas]     = useState(1);
     const [producto, setProducto]         = useState('');
-    const [fechaCompra, setFechaCompra]   = useState(null);
+    const [fechaCompra, setFechaCompra]   = useState( moment( new Date() ).format('YYYY-MM-DD HH:mm') );
     const [userSessionLocal, setUserSessionLocal] = useState({});
 
     const onChangeCuotas = ( { target } ) => {
@@ -51,7 +50,7 @@ export const Form = () => {
     const onClickAgregar = ( e ) => {
         
         e.preventDefault();
-        
+
         let info = {
             NAME: producto,
             TOTAL: parseFloat(gastoTotal.toFixed(2)),
@@ -61,7 +60,7 @@ export const Form = () => {
             DATE_MONTH_PURCHASE: moment(fechaCompra).format('YYYY-MM-02 00:00'), // Seteo para que pueda hacer bien el calculo automatizado
             ID_USER: userSessionLocal.ID_USER
         };
-
+        console.log(info);
         if(info.ID_USER == undefined){
             Swal.fire({
                 icon: 'error',
@@ -70,9 +69,10 @@ export const Form = () => {
                 confirmButtonColor: '#3085d6',
                 confirmButtonText: 'Ir a iniciar sesión'
             }).then( res => {
-                if (res.isConfirmed) 
+                if (res.isConfirmed){
                   navigate('/');
                   return;
+                }
             });
         }
 
@@ -122,7 +122,7 @@ export const Form = () => {
         setGastoTotal(0);
         setCantCuotas(1);
         setProducto('');
-        setFechaCompra(null);
+        setFechaCompra( moment( new Date() ).format('YYYY-MM-DD HH:mm') );
     }
 
 
@@ -157,7 +157,9 @@ export const Form = () => {
                         <span>Fecha compra: </span>
                         <input  type="datetime-local" 
                                 className="form-control" 
-                                onChange={onChangeFechaCompra}/>
+                                onChange={onChangeFechaCompra}
+                                value={ fechaCompra }
+                                />
                     </div>
                     <div className="col-md-2 mb-3">
                         <span>Cuotas:</span>
