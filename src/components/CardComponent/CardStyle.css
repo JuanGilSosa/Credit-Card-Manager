@@ -19,9 +19,13 @@
     height: 200px;
     margin-top: 20px;
     background: rgb(255,209,229);
-background: radial-gradient(circle, rgba(255,209,229,1) 0%, rgba(97,74,228,1) 100%);
-/* background: rgb(255,209,229);
-background: radial-gradient(circle, rgba(255,209,229,1) 0%, rgba(97,74,228,1) 100%); */
+    background: radial-gradient(circle, rgba(255,209,229,1) 0%, rgba(97,74,228,1) 100%);
+    cursor: pointer;
+    transition: .2s;
+}
+
+.the-card:hover{
+    transform: scale(1.05); /* Esto aumenta el tamaño de un objeto asignado */ 
 }
 
 .font-halter{

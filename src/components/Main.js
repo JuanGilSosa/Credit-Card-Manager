@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { delLogin, setSessionUser } from "../store/action/actionUser";
 import { Card } from "./CardComponent/Card";
 import { CreditLimit } from "./CreditLimit";
+import { setCard } from "../store/action/actionCard";
 
 const styleLink = {
     color: 'white',
@@ -17,11 +18,9 @@ const styleLink = {
 export const Main = () => {
     const dispatch = useDispatch();
 
-    const [user, setUser] = useState({});
     const { userSession } = useSelector( state => state.user );
     
     useEffect(() => {
-        setUser(userSession);
         fetchService(`/purchase/getbyuser?IdUser=${userSession.ID_USER}`)
             .then(res => {
                 if (res.ok) {
@@ -29,11 +28,19 @@ export const Main = () => {
                     dispatch(setSessionUser(userSession));
                 }
             });
+        fetchService(`/card/getbyid?IdUser=${userSession.ID_USER}`, {}, 'GET')
+            .then(res => {
+                if(!res.ok)
+                    console.warn('[Main.js:36 - Server] Error getting cards');
+
+                dispatch( setCard( res.data ) );
+            });
     }, []);
 
     const cerrarSesion = () => {
         dispatch(startSetMonth([]));
         dispatch(delLogin());
+        dispatch(setCard([]));
     }
 
     return (
@@ -61,7 +68,7 @@ export const Main = () => {
                 <Route path='main/manager' element={ <Manager /> }/>
                 <Route path='main/history' element={ <History /> }/>
                 <Route path='main/cards' element={ <Card /> } />
-                <Route path='main/limite' element={ <CreditLimit user={user} /> } />
+                <Route path='main/limite' element={ <CreditLimit /> } />
             </Routes>
         </div>
     )

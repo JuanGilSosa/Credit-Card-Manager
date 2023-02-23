@@ -1,4 +1,5 @@
 import moment from "moment/moment";
+import validator from 'validator';
 
 export const calculateFee = ( { DATE_MONTH_PURCHASE }, month = 0, year = new Date().getFullYear() ) => { 
 
@@ -132,4 +133,22 @@ export const sendEmail = ( code, email ) => {
 			 + "&body=" + 'Tu código de verificación es: ' + code;
              
   window.location.href = sLink;
+}
+
+export const validate = (type, event, callback) => {
+  switch(type){
+    case 'int':
+      if( event.target.value.length == 1 || validator.isEmpty(event.target.value) ){
+        if( event.nativeEvent.inputType == 'deleteContentBackward' ){
+            callback('');
+            return;
+          }
+      }
+
+      if(validator.isInt(event.target.value))
+        callback(event.target.value);
+      else 
+        callback('');
+      return;
+  }
 }
