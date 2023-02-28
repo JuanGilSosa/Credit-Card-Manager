@@ -18,14 +18,16 @@ const cardStyle = {
 }
 
 
-export const TheCard = ( { key, bankName, lastDigits, cardType } ) => {
+export const TheCard = ( { key, idCard, bankName, lastDigits, cardType } ) => {
 
     const [card, setCard] = useState({
-        id: key,
+        id: idCard,
         bank: bankName,
         lDigits: lastDigits,
         cType: cardType
     });
+
+    const copyCard = Object.assign({}, card);
 
     const cardTypes = {
          'VISA':             (<FontAwesomeIcon style={cardStyle} icon={faCcVisa} />       ),
@@ -36,45 +38,71 @@ export const TheCard = ( { key, bankName, lastDigits, cardType } ) => {
          'JCB':              (<FontAwesomeIcon style={cardStyle} icon={faCcJcb} />        ),
          'Otros':            (<FontAwesomeIcon style={cardStyle} icon={faCreditCard} />   ) 
     };
+
     const getCardType = ( _cType, _cardSelected ) => {
-        
         return _cType == _cardSelected
     }
 
-    const renderSwal = () => (`
-        <div>
-            <div class="row">
-                <div class="col-lg-12">
-                    <input class="form-control" type="text" />
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-lg-3">
-                    <input class="form-control" type="number" />
-                </div>
-                <div class="col-lg-3">
-                    <select class="form-control">
-                        <option value="VISA" selected={${getCardType(cardType, 'VISA')}}> VISA </option>
-                        <option value="MASTER CARD" selected={${getCardType(cardType, 'MASTER CARD')}}> MASTER CARD</option>
-                        <option value="AMERICAN EXPRESS" selected={${getCardType(cardType, 'AMERICAN EXPRESS')}}> AMERICAN EXPRESS </option>
-                        <option value="DISCOVER" selected={${getCardType(cardType, 'DISCOVER')}}> DISCOVER </option>
-                        <option value="DINERS CLUB" selected={${getCardType(cardType, 'DINERS CLUB')}}> DINERS CLUB </option>
-                        <option value="JCB" selected={${getCardType(cardType, 'JCB')}}> JCB </option>
-                        <option value="Otros" selected={${getCardType(cardType, 'Otros')}}> Otros </option>
-                    </select>
-                </div>
+
+
+    const renderSwal = () => {
+        return (`
+        <div class="row text-start col-12">
+            <div class="col-lg-12 px-4 pt-3">
+                <span class="fs-6">Tarjeta de: </span>
+                <input id="idCardBankname" value=${card.bank} class="form-control form-control-sm" type="text" />
             </div>
         </div>
-    `);
+        <div class="row text-start col-12">
+            <div class="col-lg-6 px-4 pt-3">
+                <span class="fs-6">Digitos de la tarjeta: </span>
+                <input value="${card.lDigits}" class="form-control form-control-sm" type="number" />
+            </div>
+            <div class="col-lg-6 px-4 pt-3 pb-3">
+                <span class="fs-6">Tipo de tarjeta: </span>
+                <select class="form-control form-control-sm">
+                    <option value="VISA" selected={${getCardType(cardType, 'VISA')}}> VISA </option>
+                    <option value="MASTER CARD" selected={${getCardType(cardType, 'MASTER CARD')}}> MASTER CARD</option>
+                    <option value="AMERICAN EXPRESS" selected={${getCardType(cardType, 'AMERICAN EXPRESS')}}> AMERICAN EXPRESS </option>
+                    <option value="DISCOVER" selected={${getCardType(cardType, 'DISCOVER')}}> DISCOVER </option>
+                    <option value="DINERS CLUB" selected={${getCardType(cardType, 'DINERS CLUB')}}> DINERS CLUB </option>
+                    <option value="JCB" selected={${getCardType(cardType, 'JCB')}}> JCB </option>
+                    <option value="Otros" selected={${getCardType(cardType, 'Otros')}}> Otros </option>
+                </select>
+            </div>
+        </div>
+        `)
+    }
+
 
     const onClickEditCard = () => {
+        
+        if(card.id == undefined)
+            return;
+
         Swal.fire({
             title: `<strong>Mi Tarjeta</strong>`,
             html: renderSwal() ,
             showCloseButton: true,
-            confirmButtonText: 'Aceptar'
-          })
+            confirmButtonText: 'Guardar',
+            showCancelButton: true,
+            cancelButtonColor: 'red',
+            cancelButtonText: 'Cancelar'
+          }).then( res => {
+            if(res.isConfirmed){
+                console.log(card);
+                if(copyCard != card){
+
+                }
+            }
+          });
     }
+
+    const miElement = () => {(
+        <div>
+            
+        </div>
+    )}
     
     return (
         <div className="the-card" onClick={ onClickEditCard }>
@@ -101,3 +129,5 @@ export const TheCard = ( { key, bankName, lastDigits, cardType } ) => {
         </div>
     )
 }
+
+

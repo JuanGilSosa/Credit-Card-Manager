@@ -125,7 +125,8 @@ export const Card = () => {
                 <h2>Mis tarjetas</h2>
                 {
                     c.map(cMap => (
-                        <TheCard key={cMap.ID_CARD} 
+                        <TheCard key={cMap.ID_CARD}
+                                idCard={cMap.ID_CARD} 
                                 bankName={cMap.BANK_NAME}
                                 lastDigits={cMap.LAST_DIGITS}
                                 cardType={cMap.CARD_TYPE} />                    

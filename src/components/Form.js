@@ -60,7 +60,7 @@ export const Form = () => {
             DATE_MONTH_PURCHASE: moment(fechaCompra).format('YYYY-MM-02 00:00'), // Seteo para que pueda hacer bien el calculo automatizado
             ID_USER: userSessionLocal.ID_USER
         };
-        console.log(info);
+  
         if(info.ID_USER == undefined){
             Swal.fire({
                 icon: 'error',
