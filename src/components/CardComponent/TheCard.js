@@ -10,7 +10,9 @@ import {
 import { faCreditCard, faRss } from '@fortawesome/free-solid-svg-icons';
 import { useState } from 'react';
 import Swal from 'sweetalert2';
-import Select from "react-select";
+import { fetchService } from '../../services/fetchService';
+import { useDispatch } from 'react-redux';
+import { startUpdateCard } from '../../store/action/actionCard';
 
 const cardStyle = {
     fontSize: "50px",
@@ -18,7 +20,9 @@ const cardStyle = {
 }
 
 
-export const TheCard = ( { key, idCard, bankName, lastDigits, cardType } ) => {
+export const TheCard = ( { idCard, bankName, lastDigits, cardType } ) => {
+
+    const dispatch = useDispatch();
 
     const [card, setCard] = useState({
         id: idCard,
@@ -26,8 +30,6 @@ export const TheCard = ( { key, idCard, bankName, lastDigits, cardType } ) => {
         lDigits: lastDigits,
         cType: cardType
     });
-
-    const copyCard = Object.assign({}, card);
 
     const cardTypes = {
          'VISA':             (<FontAwesomeIcon style={cardStyle} icon={faCcVisa} />       ),
@@ -42,9 +44,7 @@ export const TheCard = ( { key, idCard, bankName, lastDigits, cardType } ) => {
     const getCardType = ( _cType, _cardSelected ) => {
         return _cType == _cardSelected
     }
-
-
-
+    
     const renderSwal = () => {
         return (`
         <div class="row text-start col-12">
@@ -56,54 +56,61 @@ export const TheCard = ( { key, idCard, bankName, lastDigits, cardType } ) => {
         <div class="row text-start col-12">
             <div class="col-lg-6 px-4 pt-3">
                 <span class="fs-6">Digitos de la tarjeta: </span>
-                <input value="${card.lDigits}" class="form-control form-control-sm" type="number" />
+                <input id="lastDigitsBank" value="${card.lDigits}" class="form-control form-control-sm" type="number" />
             </div>
             <div class="col-lg-6 px-4 pt-3 pb-3">
                 <span class="fs-6">Tipo de tarjeta: </span>
-                <select class="form-control form-control-sm">
-                    <option value="VISA" selected={${getCardType(cardType, 'VISA')}}> VISA </option>
-                    <option value="MASTER CARD" selected={${getCardType(cardType, 'MASTER CARD')}}> MASTER CARD</option>
-                    <option value="AMERICAN EXPRESS" selected={${getCardType(cardType, 'AMERICAN EXPRESS')}}> AMERICAN EXPRESS </option>
-                    <option value="DISCOVER" selected={${getCardType(cardType, 'DISCOVER')}}> DISCOVER </option>
-                    <option value="DINERS CLUB" selected={${getCardType(cardType, 'DINERS CLUB')}}> DINERS CLUB </option>
-                    <option value="JCB" selected={${getCardType(cardType, 'JCB')}}> JCB </option>
-                    <option value="Otros" selected={${getCardType(cardType, 'Otros')}}> Otros </option>
+                <select id="typeCardBank" class="form-control form-control-sm">
+                    <option value="VISA" selected=`+ getCardType(cardType, 'VISA')+`> VISA </option>
+                    <option value="MASTER CARD" selected=` + getCardType(cardType, 'MASTER CARD') + `> MASTER CARD</option>
+                    <option value="AMERICAN EXPRESS" selected=` + getCardType(cardType, 'AMERICAN EXPRESS') + `> AMERICAN EXPRESS </option>
+                    <option value="DISCOVER" selected=` + getCardType(cardType, 'DISCOVER') + `> DISCOVER </option>
+                    <option value="DINERS CLUB" selected=` + getCardType(cardType, 'DINERS CLUB') + `> DINERS CLUB </option>
+                    <option value="JCB" selected=` + getCardType(cardType, 'JCB') + `> JCB </option>
+                    <option value="Otros" selected=` + getCardType(cardType, 'Otros') + `> Otros </option>
                 </select>
             </div>
         </div>
         `)
     }
 
-
-    const onClickEditCard = () => {
+    const onClickEditCard = async () => {
         
-        if(card.id == undefined)
+        if(card.id === undefined)
             return;
 
-        Swal.fire({
+        const { value: valuesCard } = await Swal.fire({
             title: `<strong>Mi Tarjeta</strong>`,
             html: renderSwal() ,
             showCloseButton: true,
             confirmButtonText: 'Guardar',
             showCancelButton: true,
             cancelButtonColor: 'red',
-            cancelButtonText: 'Cancelar'
-          }).then( res => {
-            if(res.isConfirmed){
-                console.log(card);
-                if(copyCard != card){
-
-                }
+            cancelButtonText: 'Cancelar',
+            preConfirm: () => {
+                return [
+                    document.getElementById('idCardBankname').value,
+                    document.getElementById('lastDigitsBank').value,
+                    document.getElementById('typeCardBank').value
+                ];
             }
-          });
+        });
+
+        if(valuesCard === undefined) 
+            return;
+        
+        const cardPut = {
+            ID_CARD:     idCard,
+            BANK_NAME:   valuesCard[0],
+            LAST_DIGITS: valuesCard[1],
+            CARD_TYPE:   valuesCard[2],
+        }
+
+        dispatch( startUpdateCard( cardPut ) );
+
     }
 
-    const miElement = () => {(
-        <div>
-            
-        </div>
-    )}
-    
+
     return (
         <div className="the-card" onClick={ onClickEditCard }>
             <div className="row">

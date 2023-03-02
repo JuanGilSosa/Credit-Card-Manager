@@ -7,7 +7,6 @@ const initialState = {
 export const cardReducer = (state  = initialState, action) => {
     switch (action.type){
         case '@card/add':
-            console.log(state);
             return {
                 ...state,
                 listCard: Object.assign([], state.listCard).push(action.payload)
@@ -18,6 +17,14 @@ export const cardReducer = (state  = initialState, action) => {
                 listCard: action.payload
             }
         
+        case '@card/update':
+            const auxSt = Object.assign([], state.listCard);
+            let index = auxSt.findIndex( l => l.ID_CARD == action.payload.ID_CARD );
+            auxSt[index] = action.payload;
+            return {
+                ...state,
+                listCard: auxSt
+            }
         default:
             return state;
     }

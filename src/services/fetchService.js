@@ -4,7 +4,7 @@ const handleError = ( msg ) => {
 }
 
 export const fetchService = (endpoint, data,  method='GET') => {
-    const URL = 'http://juanidev.sytes.net:3000/api' + endpoint;
+    const URL = 'http://localhost:3003/api' + endpoint;
     var res; 
     if(['POST','DELETE', 'PUT'].some(x => x === method)){
         res = fetch(URL, {

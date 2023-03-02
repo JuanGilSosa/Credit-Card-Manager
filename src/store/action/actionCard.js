@@ -19,6 +19,35 @@ export const startAddCard = ( card ) => {
     }
 }
 
+export const startUpdateCard = ( card ) => {
+    return dispatch => {
+
+        fetchService('/card/updatebyid', card, 'PUT')
+            .then( res => {
+                
+                if(!res.ok) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Ups 🤧',
+                        text: 'Algo salió mal!',
+                    });
+                    return;
+                }
+                
+                dispatch( updateCard(card) );
+                
+                Swal.fire({
+                    position: 'top-end',
+                    icon: 'success',
+                    title: 'La tarjeta se modifico correctamente',
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+                
+            })
+    }
+}
+
 // export const startGetCards = ( idUser ) => {
 //     return dispatch => {
 //         const url = `/card/getbyid?IdUser=${idUser}`
@@ -47,3 +76,8 @@ export const setCard = ( listCard ) => ({
     type: '@card/setcards',
     payload: listCard
 });
+
+export const updateCard = ( card ) => ({
+    type: '@card/update',
+    payload: card
+})
